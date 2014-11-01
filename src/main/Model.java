@@ -16,6 +16,17 @@ public class Model {
             {1, 0, 0, 0}
     };
 
+    public static List<Point3D> getCurvePoints(List<Point3D> basePoints) {
+        List<Point3D> curvePoints = new ArrayList<Point3D>();
+        int i = 0;
+        do {
+            curvePoints.addAll(getCurvePoints(basePoints.get(i), basePoints.get(i + 1), basePoints.get(i + 2),
+                    basePoints.get(i + 3)));
+            i += 3;
+        } while (i < (basePoints.size() - 1));
+        return curvePoints;
+    }
+
     public static List<Point3D> getCurvePoints(Point3D p0, Point3D p1, Point3D p2, Point3D p3) {
 
         List<Point3D> curvePoints = new ArrayList<Point3D>();

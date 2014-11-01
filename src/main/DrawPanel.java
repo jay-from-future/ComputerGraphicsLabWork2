@@ -1,6 +1,7 @@
 package main;
 
 import Jama.Matrix;
+import interfaces.ControlPanelListener;
 import interfaces.RotateListener;
 import util.Point2D;
 import util.Point3D;
@@ -14,7 +15,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrawPanel extends JPanel implements RotateListener {
+public class DrawPanel extends JPanel implements RotateListener, ControlPanelListener {
 
     private final static int AXIS_LENGTH = 350;
     private final static double DEGREES_TO_RADIANS = Math.PI / 180;
@@ -31,6 +32,9 @@ public class DrawPanel extends JPanel implements RotateListener {
     private List<Point3D> basePoints; // базисные точки
     private List<Point3D> curvePoints; // точки кривой Безье
 
+    private boolean isBaseLineVisible = true;
+    private boolean isCurvePointMarked = true;
+
     public DrawPanel(int width, int height) {
         addMouseListener(new DrawPanelMouseListener(this, width, height));
         this.width = width;
@@ -41,15 +45,26 @@ public class DrawPanel extends JPanel implements RotateListener {
         Point3D p1 = new Point3D(10, 50, 10);
         Point3D p2 = new Point3D(10, 50, 80);
         Point3D p3 = new Point3D(10, 10, 80);
-
+        Point3D p4 = new Point3D(100, 10, 10);
+        Point3D p5 = new Point3D(100, 50, 10);
+        Point3D p6 = new Point3D(100, 50, 80);
+        Point3D p7 = new Point3D(-100, 200, 80);
+        Point3D p8 = new Point3D(-100, 200, 180);
+        Point3D p9 = new Point3D(-100, 200, 280);
 
         basePoints = new ArrayList<Point3D>();
         basePoints.add(p0);
         basePoints.add(p1);
         basePoints.add(p2);
         basePoints.add(p3);
+        basePoints.add(p4);
+        basePoints.add(p5);
+        basePoints.add(p6);
+        basePoints.add(p7);
+        basePoints.add(p8);
+        basePoints.add(p9);
 
-        curvePoints = Model.getCurvePoints(p0, p1, p2, p3);
+        curvePoints = Model.getCurvePoints(basePoints);
 
     }
 
@@ -63,7 +78,7 @@ public class DrawPanel extends JPanel implements RotateListener {
         // смещение цетра координатных осей на центр панели
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform offsetToCenter = new AffineTransform();
-        offsetToCenter.translate(width / 2, height / 2);
+        offsetToCenter.translate(width / 2, (height - 100) / 2);
         g2d.transform(offsetToCenter);
 
         // рисуем координатные оси
@@ -74,22 +89,25 @@ public class DrawPanel extends JPanel implements RotateListener {
         drawAxes(g, zeroPoint, xAxis, yAxis, zAxis);
 
         // рисуем базисные точки
-        g.setColor(Color.BLACK);
-        if (basePoints != null) {
-            Point2D prevPoint = null;
-            Point2D currentPoint;
-            for (Point3D p : basePoints) {
-                p = new Point3D(p.getX(), -p.getY(), p.getZ());
-                currentPoint = RotationUtil.orthogonalProjection(RotationUtil.rotate(p, rotationMatrix));
-                drawPointWithMark(g, currentPoint);
-                if (prevPoint != null) {
-                    drawLine(g, prevPoint, currentPoint);
+        if (isBaseLineVisible) {
+            g.setColor(Color.BLACK);
+            if (basePoints != null) {
+                Point2D prevPoint = null;
+                Point2D currentPoint;
+                for (Point3D p : basePoints) {
+                    p = new Point3D(p.getX(), -p.getY(), p.getZ());
+                    currentPoint = RotationUtil.orthogonalProjection(RotationUtil.rotate(p, rotationMatrix));
+                    drawPointWithMark(g, currentPoint);
+                    if (prevPoint != null) {
+                        drawLine(g, prevPoint, currentPoint);
+                    }
+                    prevPoint = currentPoint;
                 }
-                prevPoint = currentPoint;
             }
         }
 
         // рисуем точки кривой Безье
+        curvePoints = Model.getCurvePoints(basePoints);
         g.setColor(Color.GRAY);
         if (curvePoints != null) {
             Point2D prevPoint = null;
@@ -97,7 +115,9 @@ public class DrawPanel extends JPanel implements RotateListener {
             for (Point3D p : curvePoints) {
                 p = new Point3D(p.getX(), -p.getY(), p.getZ());
                 currentPoint = RotationUtil.orthogonalProjection(RotationUtil.rotate(p, rotationMatrix));
-//                drawPointWithMark(g, currentPoint);
+                if (isCurvePointMarked) {
+                    drawPointWithMark(g, currentPoint);
+                }
                 if (prevPoint != null) {
                     drawLine(g, prevPoint, currentPoint);
                 }
@@ -110,6 +130,14 @@ public class DrawPanel extends JPanel implements RotateListener {
     public void rotate(double alpha, double beta) {
         this.alpha += alpha;
         this.beta += beta;
+        updateRotationMatrix();
+        repaint();
+    }
+
+    @Override
+    public void setDefaultRotation() {
+        this.alpha = 35.264;
+        this.beta = 45;
         updateRotationMatrix();
         repaint();
     }
@@ -164,6 +192,23 @@ public class DrawPanel extends JPanel implements RotateListener {
     }
 
 
+    @Override
+    public void setBasePoints(List<Point3D> basePoints) {
+        this.basePoints = basePoints;
+        repaint();
+    }
+
+    @Override
+    public void setBaseLineVisible(boolean visible) {
+        this.isBaseLineVisible = visible;
+        repaint();
+    }
+
+    @Override
+    public void setCurvePointMarked(boolean marked) {
+        this.isCurvePointMarked = marked;
+        repaint();
+    }
 }
 
 class DrawPanelMouseListener extends MouseAdapter {
