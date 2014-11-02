@@ -1,6 +1,9 @@
 package interfaces;
 
 public interface RotateListener {
-    void rotate(double alpha, double beta);
+    void xRotate(double alpha);
+
+    void yRotate(double beta);
+
     void setDefaultRotation();
 }

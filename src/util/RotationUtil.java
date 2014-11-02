@@ -4,28 +4,45 @@ import Jama.Matrix;
 
 public class RotationUtil {
 
-    /**
-     * Возвращает матрицу поворота для заданных углов.
-     *
-     * @param alpha Угол поворота вокруг горизонтальной оси (x)
-     * @param beta  Угол поворота вокруг вертикальной оси (y)
-     * @return Матрица поворота
-     */
-    public static Matrix getRotationMatrix(double alpha, double beta) {
+    private final static double DEGREES_TO_RADIANS = Math.PI / 180;
+    private final static double ALPHA = 35.264;
+    private final static double BETA = 45;
+
+    public static Matrix getBaseRotation() {
+        double[][] matrixAlpha = {
+                {1, 0, 0},
+                {0, Math.cos(ALPHA * DEGREES_TO_RADIANS), Math.sin(ALPHA * DEGREES_TO_RADIANS)},
+                {0, -Math.sin(ALPHA * DEGREES_TO_RADIANS), Math.cos(ALPHA * DEGREES_TO_RADIANS)}
+        };
+        double[][] matrixBeta = {
+                {Math.cos(BETA * DEGREES_TO_RADIANS), 0, -Math.sin(BETA * DEGREES_TO_RADIANS)},
+                {0, 1, 0},
+                {Math.sin(BETA * DEGREES_TO_RADIANS), 0, Math.cos(BETA * DEGREES_TO_RADIANS)}
+        };
+        return new Matrix(matrixAlpha).times(new Matrix(matrixBeta));
+    }
+
+    public static Matrix getXRotationMatrix(Matrix rotationMatrix, double alpha) {
+        alpha *= DEGREES_TO_RADIANS;
         double[][] matrixAlpha = {
                 {1, 0, 0},
                 {0, Math.cos(alpha), Math.sin(alpha)},
                 {0, -Math.sin(alpha), Math.cos(alpha)}
         };
+        return rotationMatrix.times(new Matrix(matrixAlpha));
+    }
+
+    public static Matrix getYRotationMatrix(Matrix rotationMatrix, double beta) {
+        beta *= DEGREES_TO_RADIANS;
         double[][] matrixBeta = {
                 {Math.cos(beta), 0, -Math.sin(beta)},
                 {0, 1, 0},
                 {Math.sin(beta), 0, Math.cos(beta)}
         };
-        return new Matrix(matrixAlpha).times(new Matrix(matrixBeta));
+        return rotationMatrix.times(new Matrix(matrixBeta));
     }
 
-    public static Point3D rotate(Point3D point3D, Matrix rotationMatrix) {
+    public static Point3D convert(Point3D point3D, Matrix rotationMatrix) {
         double[] pointArray = point3D.getArray();
         double[][] pointMatrix = {
                 {pointArray[0]},

@@ -18,14 +18,13 @@ import java.util.List;
 public class DrawPanel extends JPanel implements RotateListener, ControlPanelListener {
 
     private final static int AXIS_LENGTH = 350;
-    private final static double DEGREES_TO_RADIANS = Math.PI / 180;
     private final static int POINT_SIZE = 6;
 
     private int width;
     private int height;
 
-    private double alpha = 35.264;
-    private double beta = 45;
+    private double alpha = 0;
+    private double beta = 0;
 
     private Matrix rotationMatrix;
 
@@ -71,7 +70,7 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
                 Point2D currentPoint;
                 for (Point3D p : basePoints) {
                     p = new Point3D(p.getX(), -p.getY(), p.getZ());
-                    currentPoint = RotationUtil.orthogonalProjection(RotationUtil.rotate(p, rotationMatrix));
+                    currentPoint = RotationUtil.orthogonalProjection(RotationUtil.convert(p, rotationMatrix));
                     drawPointWithMark(g, currentPoint);
                     if (prevPoint != null) {
                         drawLine(g, prevPoint, currentPoint);
@@ -95,7 +94,7 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
             Point2D currentPoint;
             for (Point3D p : curvePoints) {
                 p = new Point3D(p.getX(), -p.getY(), p.getZ());
-                currentPoint = RotationUtil.orthogonalProjection(RotationUtil.rotate(p, rotationMatrix));
+                currentPoint = RotationUtil.orthogonalProjection(RotationUtil.convert(p, rotationMatrix));
                 if (isCurvePointMarked) {
                     drawPointWithMark(g, currentPoint);
                 }
@@ -108,23 +107,41 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
     }
 
     @Override
-    public void rotate(double alpha, double beta) {
-        this.alpha += alpha;
-        this.beta += beta;
-        updateRotationMatrix();
+    public void xRotate(double alpha) {
+        this.alpha = alpha;
+        updateXRotationMatrix();
+        repaint();
+    }
+
+    @Override
+    public void yRotate(double beta) {
+        this.beta = beta;
+        updateYRotationMatrix();
         repaint();
     }
 
     @Override
     public void setDefaultRotation() {
-        this.alpha = 35.264;
-        this.beta = 45;
-        updateRotationMatrix();
+        this.alpha = 0;
+        this.beta = 0;
+        setDefaultRotationMatrix();
         repaint();
     }
 
+    private void setDefaultRotationMatrix() {
+        rotationMatrix = RotationUtil.getBaseRotation();
+    }
+
     private void updateRotationMatrix() {
-        rotationMatrix = RotationUtil.getRotationMatrix(alpha * DEGREES_TO_RADIANS, beta * DEGREES_TO_RADIANS);
+        rotationMatrix = RotationUtil.getBaseRotation();
+    }
+
+    private void updateXRotationMatrix() {
+        rotationMatrix = RotationUtil.getXRotationMatrix(rotationMatrix, alpha);
+    }
+
+    private void updateYRotationMatrix() {
+        rotationMatrix = RotationUtil.getYRotationMatrix(rotationMatrix, beta);
     }
 
     private void drawPointWithMark(Graphics g, Point2D p) {
@@ -150,9 +167,9 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
     }
 
     private void drawAxes(Graphics g, Point3D zeroPoint, Point3D xAxis, Point3D yAxis, Point3D zAxis) {
-        xAxis = RotationUtil.rotate(xAxis, rotationMatrix);
-        yAxis = RotationUtil.rotate(yAxis, rotationMatrix);
-        zAxis = RotationUtil.rotate(zAxis, rotationMatrix);
+        xAxis = RotationUtil.convert(xAxis, rotationMatrix);
+        yAxis = RotationUtil.convert(yAxis, rotationMatrix);
+        zAxis = RotationUtil.convert(zAxis, rotationMatrix);
 
         Point2D zeroPoint2D = RotationUtil.orthogonalProjection(zeroPoint);
         Point2D xAxis2D = RotationUtil.orthogonalProjection(xAxis);
@@ -226,18 +243,18 @@ class DrawPanelMouseListener extends MouseAdapter {
 
     private void rotate() {
 
-        double alpha = 0;
-        double beta = 0;
+        double alpha;
+        double beta;
 
         double x_delta = endX - startX;
         double y_delta = endY - startY;
 
         if (Math.abs(x_delta) > Math.abs(y_delta)) {
             beta = (x_delta / maxX) * 180;
+            rotateListener.yRotate(beta);
         } else {
             alpha = (y_delta / maxY) * 180;
+            rotateListener.xRotate(alpha);
         }
-
-        rotateListener.rotate(alpha, beta);
     }
 }
