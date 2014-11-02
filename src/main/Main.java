@@ -9,6 +9,6 @@ public class Main {
     public static void main(String[] args) {
         DrawPanel drawPanel = new DrawPanel(WIDTH, HEIGHT);
         ControlPanel controlPanel = new ControlPanel(drawPanel, POINT_COUNT);
-        new MainWindow("LabWork2", WIDTH, HEIGHT, drawPanel, controlPanel);
+        new MainWindow("LabWork3", WIDTH, HEIGHT, drawPanel, controlPanel);
     }
 }
