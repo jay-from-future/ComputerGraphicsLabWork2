@@ -15,8 +15,7 @@ public class Point3D extends Point2D {
 
     @Override
     public double[] getArray() {
-        double[] array = {this.getX(), this.getY(), this.getZ()};
-        return array;
+        return new double[]{this.getX(), this.getY(), this.getZ()};
     }
 
     @Override

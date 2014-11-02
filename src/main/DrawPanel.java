@@ -250,10 +250,10 @@ class DrawPanelMouseListener extends MouseAdapter {
         double y_delta = endY - startY;
 
         if (Math.abs(x_delta) > Math.abs(y_delta)) {
-            beta = (x_delta / maxX) * 180;
+            beta = (x_delta / maxX) * 90;
             rotateListener.yRotate(beta);
         } else {
-            alpha = (y_delta / maxY) * 180;
+            alpha = (y_delta / maxY) * 90;
             rotateListener.xRotate(alpha);
         }
     }

@@ -23,10 +23,9 @@ public class ControlPanel extends JPanel {
     private static final int COLUMNS = 6;
 
     // начальные значения координат точек
-    // TODO Можно изобразить более "красивую" кривую
-    private double[] xValues = {50, 50, 50, 100, 100, 100, 100, -100, -100, -100};
-    private double[] yValues = {50, 100, 50, 50, 10, 50, 50, 200, 200, 200};
-    private double[] zValues = {50, 50, 100, 50, 10, 10, 80, 80, 180, 280};
+    private double[] xValues = {-100, 0, 100, 100, 100, 0, 0, -50, -50, -100};
+    private double[] yValues = {0, 100, 100, 0, 100, 100, 0, -100, -100, 0};
+    private double[] zValues = {-100, 0, 0, 0, 100, 100, 100, 100, 0, -100};
 
     private ControlPanelListener controlPanelListener;
     private int pointCount;
