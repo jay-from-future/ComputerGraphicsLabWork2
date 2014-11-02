@@ -40,32 +40,7 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
         this.width = width;
         this.height = height;
         updateRotationMatrix();
-
-        Point3D p0 = new Point3D(10, 10, 10);
-        Point3D p1 = new Point3D(10, 50, 10);
-        Point3D p2 = new Point3D(10, 50, 80);
-        Point3D p3 = new Point3D(10, 10, 80);
-        Point3D p4 = new Point3D(100, 10, 10);
-        Point3D p5 = new Point3D(100, 50, 10);
-        Point3D p6 = new Point3D(100, 50, 80);
-        Point3D p7 = new Point3D(-100, 200, 80);
-        Point3D p8 = new Point3D(-100, 200, 180);
-        Point3D p9 = new Point3D(-100, 200, 280);
-
         basePoints = new ArrayList<Point3D>();
-        basePoints.add(p0);
-        basePoints.add(p1);
-        basePoints.add(p2);
-        basePoints.add(p3);
-        basePoints.add(p4);
-        basePoints.add(p5);
-        basePoints.add(p6);
-        basePoints.add(p7);
-        basePoints.add(p8);
-        basePoints.add(p9);
-
-        curvePoints = Model.getCurvePoints(basePoints);
-
     }
 
     @Override
@@ -106,8 +81,14 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
             }
         }
 
+        // расчитываем точки кривой Безье по базисным точкам
+        if (basePoints != null) {
+            if (!basePoints.isEmpty()) {
+                curvePoints = Model.getCurvePoints(basePoints);
+            }
+        }
+
         // рисуем точки кривой Безье
-        curvePoints = Model.getCurvePoints(basePoints);
         g.setColor(Color.GRAY);
         if (curvePoints != null) {
             Point2D prevPoint = null;

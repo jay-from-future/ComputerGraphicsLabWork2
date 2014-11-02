@@ -24,18 +24,13 @@ public class ControlPanel extends JPanel {
 
     // начальные значения координат точек
     // TODO Можно изобразить более "красивую" кривую
-    private double[] xValues = {10, 10, 10, 10, 100, 100, 100, -100, -100, -100};
-    private double[] yValues = {10, 50, 50, 10, 10, 50, 50, 200, 200, 200};
-    private double[] zValues = {10, 10, 80, 80, 10, 10, 80, 80, 180, 280};
+    private double[] xValues = {50, 50, 50, 100, 100, 100, 100, -100, -100, -100};
+    private double[] yValues = {50, 100, 50, 50, 10, 50, 50, 200, 200, 200};
+    private double[] zValues = {50, 50, 100, 50, 10, 10, 80, 80, 180, 280};
 
     private ControlPanelListener controlPanelListener;
     private int pointCount;
 
-    private JPanel controlPanel;
-    private JPanel pointPanel;
-    private JPanel buttonPanel;
-
-    private List<JLabel> pointNumber;
     private List<JTextField> pointXFields;
     private List<JTextField> pointYFields;
     private List<JTextField> pointZFields;
@@ -43,18 +38,13 @@ public class ControlPanel extends JPanel {
     private JCheckBox isBaseLineVisible;
     private JCheckBox isCurvePointMarked;
 
-    private JButton repaintButton;
-    private JButton setRandomButton;
-    private JButton setDefaultButton;
-    private JButton setDefaultRotationButton;
-
     public ControlPanel(ControlPanelListener controlPanelListener, int pointCount) {
 
         this.controlPanelListener = controlPanelListener;
         this.pointCount = pointCount;
 
-        pointPanel = new JPanel(new GridLayout(4, 10));
-        pointNumber = new ArrayList<JLabel>(pointCount);
+        JPanel pointPanel = new JPanel(new GridLayout(4, 10));
+        List<JLabel> pointNumber = new ArrayList<JLabel>(pointCount);
         pointXFields = new ArrayList<JTextField>(pointCount);
         pointYFields = new ArrayList<JTextField>(pointCount);
         pointZFields = new ArrayList<JTextField>(pointCount);
@@ -93,18 +83,18 @@ public class ControlPanel extends JPanel {
             pointPanel.add(field);
         }
 
-        buttonPanel = new JPanel(new GridLayout(3, 2));
+        JPanel buttonPanel = new JPanel(new GridLayout(3, 2));
 
         ButtonListener buttonListener = new ButtonListener();
         CheckBoxListener checkBoxListener = new CheckBoxListener();
 
-        repaintButton = new JButton(REPAINT_BUTTON_STR);
+        JButton repaintButton = new JButton(REPAINT_BUTTON_STR);
         repaintButton.addActionListener(buttonListener);
-        setRandomButton = new JButton(SET_RANDOM_BUTTON);
+        JButton setRandomButton = new JButton(SET_RANDOM_BUTTON);
         setRandomButton.addActionListener(buttonListener);
-        setDefaultButton = new JButton(DEFAULT_POINT_STR);
+        JButton setDefaultButton = new JButton(DEFAULT_POINT_STR);
         setDefaultButton.addActionListener(buttonListener);
-        setDefaultRotationButton = new JButton(DEFAULT_ROTATION_STR);
+        JButton setDefaultRotationButton = new JButton(DEFAULT_ROTATION_STR);
         setDefaultRotationButton.addActionListener(buttonListener);
 
         isBaseLineVisible = new JCheckBox(BASE_POINT_STR, true);
@@ -119,12 +109,26 @@ public class ControlPanel extends JPanel {
         buttonPanel.add(isBaseLineVisible);
         buttonPanel.add(isCurvePointMarked);
 
-        controlPanel = new JPanel(new GridLayout(2, 2));
+        JPanel controlPanel = new JPanel(new GridLayout(2, 2));
 
         controlPanel.add(pointPanel);
         controlPanel.add(buttonPanel);
 
         add(controlPanel);
+    }
+
+    private void sendBasePoints() {
+        List<Point3D> basePoints = new ArrayList<Point3D>();
+        double x;
+        double y;
+        double z;
+        for (int i = 0; i < pointCount; i++) {
+            x = Double.valueOf(pointXFields.get(i).getText());
+            y = Double.valueOf(pointYFields.get(i).getText());
+            z = Double.valueOf(pointZFields.get(i).getText());
+            basePoints.add(new Point3D(x, y, z));
+        }
+        controlPanelListener.setBasePoints(basePoints);
     }
 
     class ButtonListener implements ActionListener {
@@ -133,23 +137,13 @@ public class ControlPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (e.getActionCommand() == ControlPanel.REPAINT_BUTTON_STR) {
+            if (e.getActionCommand().equals(ControlPanel.REPAINT_BUTTON_STR)) {
                 try {
-                    List<Point3D> basePoints = new ArrayList<Point3D>();
-                    double x;
-                    double y;
-                    double z;
-                    for (int i = 0; i < pointCount; i++) {
-                        x = Double.valueOf(pointXFields.get(i).getText());
-                        y = Double.valueOf(pointYFields.get(i).getText());
-                        z = Double.valueOf(pointZFields.get(i).getText());
-                        basePoints.add(new Point3D(x, y, z));
-                    }
-                    controlPanelListener.setBasePoints(basePoints);
+                    sendBasePoints();
                 } catch (NumberFormatException exception) {
                     JOptionPane.showMessageDialog(null, "Заданы некорректные значения координат точек.");
                 }
-            } else if (e.getActionCommand() == ControlPanel.SET_RANDOM_BUTTON) {
+            } else if (e.getActionCommand().equals(ControlPanel.SET_RANDOM_BUTTON)) {
                 for (int i = 0; i < pointCount; i++) {
                     pointXFields.get(i).setText(String.valueOf(getRandomNumber(MAX_VALUE)).
                             substring(0, ControlPanel.COLUMNS));
@@ -158,19 +152,21 @@ public class ControlPanel extends JPanel {
                     pointZFields.get(i).setText(String.valueOf(getRandomNumber(MAX_VALUE)).
                             substring(0, ControlPanel.COLUMNS));
                 }
-            } else if (e.getActionCommand() == ControlPanel.DEFAULT_POINT_STR) {
-                for (int i = 0; i < pointCount; i++) {
-                    pointXFields.get(i).setText(String.valueOf(xValues[i]));
-                    pointYFields.get(i).setText(String.valueOf(yValues[i]));
-                    pointZFields.get(i).setText(String.valueOf(zValues[i]));
+            } else {
+                if (e.getActionCommand().equals(ControlPanel.DEFAULT_POINT_STR)) {
+                    for (int i = 0; i < pointCount; i++) {
+                        pointXFields.get(i).setText(String.valueOf(xValues[i]));
+                        pointYFields.get(i).setText(String.valueOf(yValues[i]));
+                        pointZFields.get(i).setText(String.valueOf(zValues[i]));
+                    }
+                } else if (e.getActionCommand().equals(ControlPanel.DEFAULT_ROTATION_STR)) {
+                    ((RotateListener) controlPanelListener).setDefaultRotation();
                 }
-            } else if (e.getActionCommand() == ControlPanel.DEFAULT_ROTATION_STR) {
-                ((RotateListener) controlPanelListener).setDefaultRotation();
             }
         }
 
         private double getRandomNumber(double max) {
-            int sign = (((int) Math.random()) == 1) ? -1 : 1;
+            int sign = (Math.random() > 0.5) ? -1 : 1;
             return sign * (Math.random() * max);
         }
     }
@@ -178,9 +174,9 @@ public class ControlPanel extends JPanel {
     class CheckBoxListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (e.getActionCommand() == ControlPanel.BASE_POINT_STR) {
+            if (e.getActionCommand().equals(ControlPanel.BASE_POINT_STR)) {
                 controlPanelListener.setBaseLineVisible(isBaseLineVisible.isSelected());
-            } else if (e.getActionCommand() == ControlPanel.CURVE_POINT_STR) {
+            } else if (e.getActionCommand().equals(ControlPanel.CURVE_POINT_STR)) {
                 controlPanelListener.setCurvePointMarked(isCurvePointMarked.isSelected());
             }
         }
