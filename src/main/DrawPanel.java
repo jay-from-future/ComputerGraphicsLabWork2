@@ -27,6 +27,7 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
     private double beta = 0;
 
     private Matrix rotationMatrix;
+    private Matrix defaultRoatationMatrix;
 
     private List<Point3D> basePoints; // базисные точки
     private List<Point3D> curvePoints; // точки кривой Безье
@@ -39,6 +40,7 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
         this.width = width;
         this.height = height;
         updateRotationMatrix();
+        defaultRoatationMatrix = rotationMatrix;
         basePoints = new ArrayList<Point3D>();
     }
 
@@ -167,9 +169,9 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
     }
 
     private void drawAxes(Graphics g, Point3D zeroPoint, Point3D xAxis, Point3D yAxis, Point3D zAxis) {
-        xAxis = RotationUtil.convert(xAxis, rotationMatrix);
-        yAxis = RotationUtil.convert(yAxis, rotationMatrix);
-        zAxis = RotationUtil.convert(zAxis, rotationMatrix);
+        xAxis = RotationUtil.convert(xAxis, defaultRoatationMatrix);
+        yAxis = RotationUtil.convert(yAxis, defaultRoatationMatrix);
+        zAxis = RotationUtil.convert(zAxis, defaultRoatationMatrix);
 
         Point2D zeroPoint2D = RotationUtil.orthogonalProjection(zeroPoint);
         Point2D xAxis2D = RotationUtil.orthogonalProjection(xAxis);
