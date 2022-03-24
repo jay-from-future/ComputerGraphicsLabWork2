@@ -1,11 +1,11 @@
-package main;
+package xyz.jayfromfuture;
 
 import Jama.Matrix;
-import interfaces.ControlPanelListener;
-import interfaces.RotateListener;
-import util.Point2D;
-import util.Point3D;
-import util.RotationUtil;
+import xyz.jayfromfuture.interfaces.ControlPanelListener;
+import xyz.jayfromfuture.interfaces.RotateListener;
+import xyz.jayfromfuture.util.Point2D;
+import xyz.jayfromfuture.util.Point3D;
+import xyz.jayfromfuture.util.RotationUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,8 +20,8 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
     private final static int AXIS_LENGTH = 350;
     private final static int POINT_SIZE = 6;
 
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
 
     private double alpha = 0;
     private double beta = 0;
@@ -39,7 +39,7 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
         this.width = width;
         this.height = height;
         updateRotationMatrix();
-        basePoints = new ArrayList<Point3D>();
+        basePoints = new ArrayList<>();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
         // смещение цетра координатных осей на центр панели
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform offsetToCenter = new AffineTransform();
-        offsetToCenter.translate(width / 2, (height - 100) / 2);
+        offsetToCenter.translate(width / 2.0, (height - 100) / 2.0);
         g2d.transform(offsetToCenter);
 
         // рисуем координатные оси
@@ -211,10 +211,10 @@ public class DrawPanel extends JPanel implements RotateListener, ControlPanelLis
 
 class DrawPanelMouseListener extends MouseAdapter {
 
-    private RotateListener rotateListener;
+    private final RotateListener rotateListener;
 
-    private int maxX;
-    private int maxY;
+    private final int maxX;
+    private final int maxY;
 
     private int startX;
     private int startY;

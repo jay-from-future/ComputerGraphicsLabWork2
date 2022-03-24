@@ -1,7 +1,7 @@
-package main;
+package xyz.jayfromfuture;
 
 import Jama.Matrix;
-import util.Point3D;
+import xyz.jayfromfuture.util.Point3D;
 
 import java.util.ArrayList;
 import java.util.List;

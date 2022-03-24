@@ -1,8 +1,8 @@
-package main;
+package xyz.jayfromfuture;
 
-import interfaces.ControlPanelListener;
-import interfaces.RotateListener;
-import util.Point3D;
+import xyz.jayfromfuture.interfaces.ControlPanelListener;
+import xyz.jayfromfuture.interfaces.RotateListener;
+import xyz.jayfromfuture.util.Point3D;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,19 +23,19 @@ public class ControlPanel extends JPanel {
     private static final int COLUMNS = 6;
 
     // начальные значения координат точек
-    private double[] xValues = {-100, 0, 100, 100, 100, 0, 0, -50, -50, -100};
-    private double[] yValues = {0, 100, 100, 0, 100, 100, 0, -100, -100, 0};
-    private double[] zValues = {-100, 0, 0, 0, 100, 100, 100, 100, 0, -100};
+    private final double[] xValues = {-100, 0, 100, 100, 100, 0, 0, -50, -50, -100};
+    private final double[] yValues = {0, 100, 100, 0, 100, 100, 0, -100, -100, 0};
+    private final double[] zValues = {-100, 0, 0, 0, 100, 100, 100, 100, 0, -100};
 
-    private ControlPanelListener controlPanelListener;
-    private int pointCount;
+    private final ControlPanelListener controlPanelListener;
+    private final int pointCount;
 
-    private List<JTextField> pointXFields;
-    private List<JTextField> pointYFields;
-    private List<JTextField> pointZFields;
+    private final List<JTextField> pointXFields;
+    private final List<JTextField> pointYFields;
+    private final List<JTextField> pointZFields;
 
-    private JCheckBox isBaseLineVisible;
-    private JCheckBox isCurvePointMarked;
+    private final JCheckBox isBaseLineVisible;
+    private final JCheckBox isCurvePointMarked;
 
     public ControlPanel(ControlPanelListener controlPanelListener, int pointCount) {
 
@@ -43,10 +43,10 @@ public class ControlPanel extends JPanel {
         this.pointCount = pointCount;
 
         JPanel pointPanel = new JPanel(new GridLayout(4, 10));
-        List<JLabel> pointNumber = new ArrayList<JLabel>(pointCount);
-        pointXFields = new ArrayList<JTextField>(pointCount);
-        pointYFields = new ArrayList<JTextField>(pointCount);
-        pointZFields = new ArrayList<JTextField>(pointCount);
+        List<JLabel> pointNumber = new ArrayList<>(pointCount);
+        pointXFields = new ArrayList<>(pointCount);
+        pointYFields = new ArrayList<>(pointCount);
+        pointZFields = new ArrayList<>(pointCount);
 
         for (int i = 0; i < pointCount; i++) {
             pointNumber.add(new JLabel(String.valueOf(i + 1)));
@@ -117,14 +117,14 @@ public class ControlPanel extends JPanel {
     }
 
     private void sendBasePoints() {
-        List<Point3D> basePoints = new ArrayList<Point3D>();
+        List<Point3D> basePoints = new ArrayList<>();
         double x;
         double y;
         double z;
         for (int i = 0; i < pointCount; i++) {
-            x = Double.valueOf(pointXFields.get(i).getText());
-            y = Double.valueOf(pointYFields.get(i).getText());
-            z = Double.valueOf(pointZFields.get(i).getText());
+            x = Double.parseDouble(pointXFields.get(i).getText());
+            y = Double.parseDouble(pointYFields.get(i).getText());
+            z = Double.parseDouble(pointZFields.get(i).getText());
             basePoints.add(new Point3D(x, y, z));
         }
         controlPanelListener.setBasePoints(basePoints);
@@ -144,11 +144,11 @@ public class ControlPanel extends JPanel {
                 }
             } else if (e.getActionCommand().equals(ControlPanel.SET_RANDOM_BUTTON)) {
                 for (int i = 0; i < pointCount; i++) {
-                    pointXFields.get(i).setText(String.valueOf(getRandomNumber(MAX_VALUE)).
+                    pointXFields.get(i).setText(String.valueOf(getRandomNumber()).
                             substring(0, ControlPanel.COLUMNS));
-                    pointYFields.get(i).setText(String.valueOf(getRandomNumber(MAX_VALUE)).
+                    pointYFields.get(i).setText(String.valueOf(getRandomNumber()).
                             substring(0, ControlPanel.COLUMNS));
-                    pointZFields.get(i).setText(String.valueOf(getRandomNumber(MAX_VALUE)).
+                    pointZFields.get(i).setText(String.valueOf(getRandomNumber()).
                             substring(0, ControlPanel.COLUMNS));
                 }
             } else {
@@ -164,9 +164,9 @@ public class ControlPanel extends JPanel {
             }
         }
 
-        private double getRandomNumber(double max) {
+        private double getRandomNumber() {
             int sign = (Math.random() > 0.5) ? -1 : 1;
-            return sign * (Math.random() * max);
+            return sign * (Math.random() * ButtonListener.MAX_VALUE);
         }
     }
 
